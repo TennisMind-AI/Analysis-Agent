@@ -162,10 +162,15 @@ Expected trigger request body:
 
 ```json
 {
-  "user_id": "user-123",
-  "context": {},
-  "analysis": {},
-  "latest_text": "..."
+  "event_id": "uuid",
+  "timestamp": "2026-04-24T12:00:00+00:00",
+  "type": "analysis_feedback",
+  "payload": {
+    "user_id": "user-123",
+    "context": {},
+    "analysis": {},
+    "latest_text": "..."
+  }
 }
 ```
 

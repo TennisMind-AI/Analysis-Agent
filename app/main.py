@@ -7,6 +7,8 @@ import base64
 import time
 from pathlib import Path
 from typing import Any
+from datetime import datetime, timezone
+from uuid import uuid4
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
@@ -100,10 +102,15 @@ def _log_to_context_agent(
     response = requests.post(
         context_trigger_url,
         json={
-            "user_id": user_id,
-            "context": context,
-            "analysis": analysis,
-            "latest_text": text,
+            "event_id": str(uuid4()),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "type": "analysis_feedback",
+            "payload": {
+                "user_id": user_id,
+                "context": context,
+                "analysis": analysis,
+                "latest_text": text,
+            },
         },
         headers={"Content-Type": "application/json"},
         timeout=30,
