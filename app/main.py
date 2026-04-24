@@ -392,36 +392,48 @@ def _format_trigger_text(
     memory: dict[str, Any],
     context_agent_context: dict[str, Any] | None,
 ) -> str:
-    stroke_type = analysis.get("stroke_type", "unknown")
-    overall = analysis.get("overall_assessment", analysis.get("summary", "No assessment available."))
+    def clean_text(value: Any) -> str:
+        if value is None:
+            return ""
+        text = str(value).strip()
+        lowered = text.lower()
+        if lowered in {"unknown", "not applicable", "n/a", "none", ""}:
+            return ""
+        return text
+
+    stroke_type = clean_text(analysis.get("stroke_type")) or "tennis"
+    overall = clean_text(analysis.get("overall_assessment")) or clean_text(analysis.get("summary")) or "This clip shows useful technical information."
     strengths = analysis.get("strengths") or []
     issues = analysis.get("issues") or []
     tips = analysis.get("coaching_tips") or []
     history = memory.get("history") or []
-    stance = analysis.get("stance", "unknown")
-    footwork = analysis.get("footwork", "unknown")
-    swing_path = analysis.get("swing_path", "unknown")
-    contact_point = analysis.get("contact_point_estimate", "unknown")
-    follow_through = analysis.get("follow_through", "unknown")
-    hitting_phase = analysis.get("hitting_phase", "unknown")
-    court_context = analysis.get("court_context", "unknown")
+    stance = clean_text(analysis.get("stance"))
+    footwork = clean_text(analysis.get("footwork"))
+    swing_path = clean_text(analysis.get("swing_path"))
+    contact_point = clean_text(analysis.get("contact_point_estimate"))
+    follow_through = clean_text(analysis.get("follow_through"))
+    hitting_phase = clean_text(analysis.get("hitting_phase"))
+    court_context = clean_text(analysis.get("court_context"))
 
-    parts = [
-        f"This clip appears to show {stroke_type} tennis work in a {court_context} setting.",
-        f"The main phase captured here is {hitting_phase}.",
-        f"My overall technical assessment is: {overall}",
-    ]
+    parts = []
+    if court_context:
+        parts.append(f"This clip appears to show {stroke_type} tennis work in a {court_context} setting.")
+    else:
+        parts.append(f"This clip appears to show {stroke_type} tennis work.")
+    if hitting_phase:
+        parts.append(f"The main phase captured here is {hitting_phase}.")
+    parts.append(f"My overall technical assessment is: {overall}")
 
     technical_observations = []
-    if stance != "unknown":
+    if stance:
         technical_observations.append(f"stance looks {stance}")
-    if footwork != "unknown":
+    if footwork:
         technical_observations.append(f"footwork looks {footwork}")
-    if swing_path != "unknown":
+    if swing_path:
         technical_observations.append(f"swing path looks {swing_path}")
-    if contact_point != "unknown":
+    if contact_point:
         technical_observations.append(f"contact point appears {contact_point}")
-    if follow_through != "unknown":
+    if follow_through:
         technical_observations.append(f"follow through looks {follow_through}")
     if technical_observations:
         parts.append("From a stroke mechanics perspective, " + ", ".join(technical_observations[:4]) + ".")
