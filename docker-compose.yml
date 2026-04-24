@@ -1,0 +1,12 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      VIDEO_ANALYZER_CLIENT: ${VIDEO_ANALYZER_CLIENT:-openai_api}
+      VIDEO_ANALYZER_API_KEY: ${VIDEO_ANALYZER_API_KEY:-}
+      VIDEO_ANALYZER_API_URL: ${VIDEO_ANALYZER_API_URL:-https://openrouter.ai/api/v1}
+      VIDEO_ANALYZER_MODEL: ${VIDEO_ANALYZER_MODEL:-meta-llama/llama-3.2-11b-vision-instruct:free}
