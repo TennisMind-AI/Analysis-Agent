@@ -99,6 +99,23 @@ def _log_to_context_agent(
     if not context_trigger_url:
         return
 
+    raw_confidence = analysis.get("confidence", 0.0)
+    if isinstance(raw_confidence, (int, float)):
+        confidence_value = float(raw_confidence)
+    elif isinstance(raw_confidence, str):
+        normalized = raw_confidence.strip().lower()
+        confidence_map = {
+            "low": 0.3,
+            "medium": 0.6,
+            "high": 0.9,
+            "very high": 0.95,
+            "very low": 0.15,
+            "uncertain": 0.2,
+        }
+        confidence_value = confidence_map.get(normalized, 0.0)
+    else:
+        confidence_value = 0.0
+
     response = requests.post(
         context_trigger_url,
         json={
@@ -106,7 +123,7 @@ def _log_to_context_agent(
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "type": "analysis_feedback",
             "payload": {
-                "value": float(analysis.get("confidence", 0.0) or 0.0),
+                "value": confidence_value,
                 "context": (
                     f"user_id={user_id}; "
                     f"summary={analysis.get('summary', '')}; "
