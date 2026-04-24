@@ -106,10 +106,17 @@ def _log_to_context_agent(
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "type": "analysis_feedback",
             "payload": {
-                "user_id": user_id,
-                "context": context,
-                "analysis": analysis,
-                "latest_text": text,
+                "value": float(analysis.get("confidence", 0.0) or 0.0),
+                "context": (
+                    f"user_id={user_id}; "
+                    f"summary={analysis.get('summary', '')}; "
+                    f"stroke_type={analysis.get('stroke_type', '')}; "
+                    f"issues={', '.join(analysis.get('issues') or [])}; "
+                    f"coaching_tips={', '.join(analysis.get('coaching_tips') or [])}; "
+                    f"preferred_focus={context.get('preferred_focus', '')}; "
+                    f"recurring_issue={context.get('recurring_issue', '')}; "
+                    f"latest_text={text}"
+                ),
             },
         },
         headers={"Content-Type": "application/json"},
