@@ -119,6 +119,7 @@ def _log_to_context_agent(
     response = requests.post(
         context_trigger_url,
         json={
+            "user_id": user_id,
             "event_id": str(uuid4()),
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "type": "analysis_feedback",
